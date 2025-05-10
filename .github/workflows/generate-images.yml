@@ -1,0 +1,56 @@
+name: Generate images
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+permissions:
+  contents: write
+
+jobs:
+  build-and-release:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: denoland/setup-deno@v1
+        with:
+          deno-version: v2.2.4
+
+      - run: deno task run
+
+      - id: get_version
+        run: echo "version=$(jq -r '.version' deno.json)" >> $GITHUB_OUTPUT
+
+      - run: zip -r images-${{ steps.get_version.outputs.version }}.zip images/
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: images-${{ steps.get_version.outputs.version }}
+          path: images-${{ steps.get_version.outputs.version }}.zip
+
+      - if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: v${{ steps.get_version.outputs.version }}
+          name: Release v${{ steps.get_version.outputs.version }}
+          files: images-${{ steps.get_version.outputs.version }}.zip
+          generate_release_notes: true
+
+      - if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        run: |
+          CURRENT_VERSION=$(jq -r '.version' deno.json)
+          IFS='.' read -ra VERSION <<< "$CURRENT_VERSION"
+          NEW_VERSION="${VERSION[0]}.${VERSION[1]}.$((VERSION[2] + 1))"
+          jq --arg version "$NEW_VERSION" '.version = $version' deno.json > temp.json && mv temp.json deno.json
+
+      - if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add deno.json
+          git commit -m "Bump version [skip ci]"
+          git push
