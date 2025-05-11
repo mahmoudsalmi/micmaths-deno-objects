@@ -74,5 +74,9 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - uses: denoland/setup-deno@v1
+        with:
+          deno-version: v2.2.4
+
       - name: Publish package
-        run: npx jsr publish
+        run: deno publish
