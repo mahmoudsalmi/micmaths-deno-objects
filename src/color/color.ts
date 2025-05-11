@@ -80,7 +80,7 @@ export class Color {
    * Converts the color to an RGBA string.
    * @returns A CSS-compatible RGBA string representation (e.g., "rgba(255, 0, 0, 255)")
    */
-  toString() {
+  toString(): string {
     return `rgba(${this.r}, ${this.g}, ${this.b}, ${this.a})`;
   }
 
@@ -121,7 +121,19 @@ export class Color {
   }
 }
 
-export const colors = {
+export const colors: {
+  Black: Color;
+  White: Color;
+  Red: Color;
+  Green: Color;
+  Blue: Color;
+  Yellow: Color;
+  Magenta: Color;
+  Cyan: Color;
+  Transparent: Color;
+  Gray: Color;
+  DarkGray: Color;
+} = {
   Black: new Color(0, 0, 0, 255),
   White: new Color(255, 255, 255, 255),
   Red: new Color(255, 0, 0, 255),
@@ -133,4 +145,4 @@ export const colors = {
   Transparent: new Color(0, 0, 0, 0),
   Gray: new Color(128, 128, 128, 255),
   DarkGray: new Color(64, 64, 64, 255),
-};
+} as const;
