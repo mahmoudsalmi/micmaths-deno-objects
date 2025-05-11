@@ -1,11 +1,19 @@
 {
-  "name": "maths-objects",
+  "name": "@salmidev/maths-objects",
   "version": "0.1.1",
+  "exports": "./src/mod.ts",
+  "license": "MIT",
   "tasks": {
-    "dev": "deno run -A --watch src/main.ts",
-    "run": "deno run -A src/main.ts"
+    "dev": "deno run --allow-read=./maths-objects-images --allow-write=./maths-objects-images --watch src/main.ts",
+    "run": "deno run --allow-read=./maths-objects-images --allow-write=./maths-objects-images src/main.ts",
+    "test": "deno test --allow-read=./maths-objects-images --allow-write=./maths-objects-images",
+    "test:watch": "deno test --allow-read=./maths-objects-images --allow-write=./maths-objects-images --watch",
+    "coverage": "deno test --coverage && deno coverage"
   },
   "imports": {
-    "@img/png": "jsr:@img/png@^0.1.2"
+    "@img/png": "jsr:@img/png@^0.1.2",
+    "@std/expect": "jsr:@std/expect@^1.0.15",
+    "@std/path": "jsr:@std/path@^1.0.9",
+    "@std/testing": "jsr:@std/testing@^1.0.11"
   }
 }
