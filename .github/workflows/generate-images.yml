@@ -13,10 +13,6 @@ jobs:
   build-and-release:
     runs-on: ubuntu-latest
 
-    permissions:
-      contents: read
-      id-token: write
-
     steps:
       - uses: actions/checkout@v4
 
@@ -33,12 +29,8 @@ jobs:
       - id: get_version
         run: echo "version=$(jq -r '.version' deno.json)" >> $GITHUB_OUTPUT
 
-      - run: zip -r images-${{ steps.get_version.outputs.version }}.zip maths-objects-images/
-
-      - uses: actions/upload-artifact@v4
-        with:
-          name: images-${{ steps.get_version.outputs.version }}
-          path: images-${{ steps.get_version.outputs.version }}.zip
+      - name: Compress Images
+        run: zip -r images-${{ steps.get_version.outputs.version }}.zip maths-objects-images/
 
       - name: Bump version
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
@@ -66,7 +58,21 @@ jobs:
           files: images-${{ steps.get_version.outputs.version }}.zip
           generate_release_notes: true
 
+      - uses: actions/upload-artifact@v4
+        with:
+          name: images-${{ steps.get_version.outputs.version }}
+          path: images-${{ steps.get_version.outputs.version }}.zip
+
+  publish-jsr:
+    runs-on: ubuntu-latest
+    needs: [ build-and-release ]
+
+    permissions:
+      contents: read
+      id-token: write
+
+    steps:
+      - uses: actions/checkout@v4
+
       - name: Publish package
         run: npx jsr publish
-
-
